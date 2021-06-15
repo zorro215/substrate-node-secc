@@ -39,8 +39,8 @@ pub use frame_support::{
 };
 use pallet_transaction_payment::CurrencyAdapter;
 
-/// Import the template pallet.
-pub use pallet_template;
+/// Import the sign-data pallet.
+pub use pallet_sign_data;
 // use frame_benchmarking::frame_support::Parameter;
 // use frame_benchmarking::frame_support::pallet_prelude::Member;
 
@@ -267,8 +267,8 @@ impl pallet_sudo::Config for Runtime {
 	type Call = Call;
 }
 
-/// Configure the pallet-template in pallets/template.
-impl pallet_template::Config for Runtime {
+/// Configure the pallet-sign-data in pallets/sign-data.
+impl pallet_sign_data::Config for Runtime {
 	type DeviceType = u8;
 	type Event = Event;
 }
@@ -288,8 +288,8 @@ construct_runtime!(
 		Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
 		TransactionPayment: pallet_transaction_payment::{Module, Storage},
 		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
-		// Include the custom logic from the pallet-template in the runtime.
-		TemplateModule: pallet_template::{Module, Call, Storage, Event<T>},
+		// Include the custom logic from the pallet-sign-data in the runtime.
+		SignData: pallet_sign_data::{Module, Call, Storage, Event<T>},
 	}
 );
 

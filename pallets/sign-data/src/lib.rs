@@ -36,8 +36,8 @@ pub mod pallet {
 
     #[pallet::storage]
     #[pallet::getter(fn owned_devices)]
-    /// 账户和设备关联关系 u8
-    pub type OwnedDevices<T: Config> = StorageDoubleMap<_, Twox64Concat, T::AccountId, Twox64Concat, T::DeviceType, Vec<u8>,ValueQuery>;
+    /// 账户和设备关联关系 DeviceType u8
+    pub type OwnedDevices<T: Config> = StorageDoubleMap<_, Twox64Concat, T::AccountId, Twox64Concat, T::DeviceType, Vec<u8>>;
 
     // Pallets use events to inform users when important changes are made.
     // https://substrate.dev/docs/en/knowledgebase/runtime/events

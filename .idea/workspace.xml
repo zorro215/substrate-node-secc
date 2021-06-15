@@ -12,11 +12,19 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95fc269a-9bea-4656-b936-03b932d612ec" name="Default Changelist" comment="init">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="95fc269a-9bea-4656-b936-03b932d612ec" name="Default Changelist" comment="init pallet">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/substrate-node-secc.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/substrate-node-secc.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pallets/template/src/benchmarking.rs" beforeDir="false" afterPath="$PROJECT_DIR$/pallets/template/src/benchmarking.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pallets/template/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/pallets/template/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pallets/template/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pallets/sign-data/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pallets/template/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/pallets/sign-data/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pallets/template/src/benchmarking.rs" beforeDir="false" afterPath="$PROJECT_DIR$/pallets/sign-data/src/benchmarking.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pallets/template/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/pallets/sign-data/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pallets/template/src/mock.rs" beforeDir="false" afterPath="$PROJECT_DIR$/pallets/sign-data/src/mock.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pallets/template/src/tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/pallets/sign-data/src/tests.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runtime/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/runtime/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/runtime/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/runtime/src/lib.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -92,6 +100,11 @@
     </key>
   </component>
   <component name="RunManager" selected="Cargo.Debug">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Clean" type="CargoCommandRunConfiguration" factoryName="Cargo Command" nameIsGenerated="true">
       <option name="command" value="clean -p node-template" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -153,6 +166,7 @@
       <workItem from="1623748699979" duration="620000" />
       <workItem from="1623754960131" duration="4263000" />
       <workItem from="1623766567458" duration="4215000" />
+      <workItem from="1623771181386" duration="1891000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <created>1623560367106</created>
@@ -161,7 +175,14 @@
       <option name="project" value="LOCAL" />
       <updated>1623560367107</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="init pallet">
+      <created>1623771282622</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1623771282622</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -181,17 +202,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="init" />
-    <option name="LAST_COMMIT_MESSAGE" value="init" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/pallets/template/src/lib.rs</url>
-          <line>71</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="init pallet" />
+    <option name="LAST_COMMIT_MESSAGE" value="init pallet" />
   </component>
 </project>
