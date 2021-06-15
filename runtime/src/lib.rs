@@ -41,6 +41,8 @@ use pallet_transaction_payment::CurrencyAdapter;
 
 /// Import the template pallet.
 pub use pallet_template;
+// use frame_benchmarking::frame_support::Parameter;
+// use frame_benchmarking::frame_support::pallet_prelude::Member;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -267,6 +269,7 @@ impl pallet_sudo::Config for Runtime {
 
 /// Configure the pallet-template in pallets/template.
 impl pallet_template::Config for Runtime {
+	type DeviceType = u8;
 	type Event = Event;
 }
 
