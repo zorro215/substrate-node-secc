@@ -24,8 +24,6 @@ pub mod pallet {
     /// Configure the pallet by specifying the parameters and types on which it depends.
     #[pallet::config]
     pub trait Config: frame_system::Config {
-        /// 设备类型 1:手环 2:床垫 3:血糖仪 4:血压计 5:体温计 6:跌倒报警 7:电子围栏 8:其他
-        type DeviceType: Parameter + Member + Default + Copy;
         /// 关系 1:本人 2:父亲 3:母亲 3:岳父 4:岳母 9:其他
         type RelationType: Parameter + Member + Default + Copy;
         /// Because this pallet emits events, it depends on the runtime's definition of an event.
@@ -38,9 +36,9 @@ pub mod pallet {
 
 
     #[pallet::storage]
-    #[pallet::getter(fn owned_devices)]
-    /// 账户和设备关联关系 DeviceType u8
-    pub type OwnedDevices<T: Config> = StorageDoubleMap<_, Twox64Concat, T::AccountId, Twox64Concat, (T::RelationType, T::DeviceType), Vec<u8>>;
+    #[pallet::getter(fn relation_id_cards)]
+    /// 账户和身份证关联关系 RelationType u8
+    pub type RelationIdCards<T: Config> = StorageDoubleMap<_, Twox64Concat, T::AccountId, Twox64Concat, T::RelationType, Vec<u8>>;
 
     // Pallets use events to inform users when important changes are made.
     // https://substrate.dev/docs/en/knowledgebase/runtime/events
@@ -65,14 +63,13 @@ pub mod pallet {
     #[pallet::hooks]
     impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {}
 
-
     #[pallet::call]
     impl<T: Config> Pallet<T> {
-        /// 绑定设备
+        /// 绑定亲属身份证
         #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-        pub fn bind(origin: OriginFor<T>, relation_type: T::RelationType, device_type: T::DeviceType, sn: Vec<u8>) -> DispatchResultWithPostInfo {
+        pub fn bind(origin: OriginFor<T>, relation_type: T::RelationType, id_card: Vec<u8>) -> DispatchResultWithPostInfo {
             let sender = ensure_signed(origin)?;
-            OwnedDevices::<T>::insert(&sender, (relation_type,device_type), sn);
+            RelationIdCards::<T>::insert(&sender, relation_type, id_card);
             Ok(().into())
         }
     }

@@ -13,19 +13,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95fc269a-9bea-4656-b936-03b932d612ec" name="Default Changelist" comment="init pallet">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/substrate-node-secc.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/substrate-node-secc.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pallets/health-ai/Cargo.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pallets/health-ai/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pallets/health-ai/src/benchmarking.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pallets/health-ai/src/lib.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pallets/health-ai/src/mock.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pallets/health-ai/src/tests.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pallets/template/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pallets/sign-data/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pallets/template/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/pallets/sign-data/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pallets/template/src/benchmarking.rs" beforeDir="false" afterPath="$PROJECT_DIR$/pallets/sign-data/src/benchmarking.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pallets/template/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/pallets/sign-data/src/lib.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pallets/template/src/mock.rs" beforeDir="false" afterPath="$PROJECT_DIR$/pallets/sign-data/src/mock.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pallets/template/src/tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/pallets/sign-data/src/tests.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pallets/sign-data/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/pallets/sign-data/src/lib.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/runtime/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/runtime/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/runtime/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/runtime/src/lib.rs" afterDir="false" />
+    </list>
+    <list id="e336f8c8-6b2b-48c5-8dda-0da33f7cf305" name="Ignore changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/substrate-node-secc.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/substrate-node-secc.iml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,22 +90,18 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
     <property name="cidr.known.project.marker" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/pallets" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/pallets" />
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
   <component name="RunManager" selected="Cargo.Debug">
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="Clean" type="CargoCommandRunConfiguration" factoryName="Cargo Command" nameIsGenerated="true">
       <option name="command" value="clean -p node-template" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -137,6 +134,11 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <list>
       <item itemvalue="Cargo.Debug" />
       <item itemvalue="Cargo.Clean" />
@@ -150,6 +152,7 @@
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="95fc269a-9bea-4656-b936-03b932d612ec" name="Default Changelist" comment="" />
+      <changelist id="e336f8c8-6b2b-48c5-8dda-0da33f7cf305" name="Ignore changelist" comment="" />
       <created>1621059101396</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -167,6 +170,7 @@
       <workItem from="1623754960131" duration="4263000" />
       <workItem from="1623766567458" duration="4215000" />
       <workItem from="1623771181386" duration="1891000" />
+      <workItem from="1623829553729" duration="5894000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <created>1623560367106</created>
