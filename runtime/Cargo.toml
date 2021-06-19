@@ -46,8 +46,8 @@ sp-transaction-pool = { default-features = false, version = '3.0.0' }
 sp-version = { default-features = false, version = '3.0.0' }
 
 # local dependencies
-pallet-sign-data = { default-features = false, path = '../pallets/sign-data', version = '3.0.0' }
 pallet-health-ai = { default-features = false, path = '../pallets/health-ai', version = '3.0.0' }
+pallet-sign-data = { default-features = false, path = '../pallets/sign-data', version = '3.0.0' }
 
 [features]
 default = ['std']

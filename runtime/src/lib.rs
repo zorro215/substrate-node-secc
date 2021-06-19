@@ -270,7 +270,7 @@ impl pallet_sudo::Config for Runtime {
 /// Configure the pallet-sign-data in pallets/sign-data.
 impl pallet_sign_data::Config for Runtime {
     type DeviceType = u8;
-    type RelationType = u8;
+    // type RelationType = u8;
     type Event = Event;
 }
 

@@ -1,7 +1,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use codec::{Decode, Encode};
-use frame_support::{dispatch::DispatchResult, ensure, RuntimeDebug};
 use serde::{Deserialize, Deserializer, Serialize};
 use sp_std::vec::Vec;
 
@@ -16,8 +15,8 @@ mod tests;
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 
-
-#[derive(Debug, Serialize, Deserialize, Encode, Decode, Default)]
+#[derive(Debug, Serialize, Deserialize, Encode, Decode, Default, Clone, PartialEq)]
+///绑定对象信息
 pub struct PersonInfo {
     #[serde(deserialize_with = "de_string_to_bytes")]
     name: Vec<u8>,
@@ -49,7 +48,7 @@ pub mod pallet {
     /// Configure the pallet by specifying the parameters and types on which it depends.
     #[pallet::config]
     pub trait Config: frame_system::Config {
-        /// 关系 1:本人 2:父亲 3:母亲 3:岳父 4:岳母 9:其他
+        /// 关系 1:本人 2:父亲 3:母亲 3:岳父 4:岳母 9:其他 因为亲属关系太多，就不用枚举了，前后端约定即可
         type RelationType: Parameter + Member + Default + Copy;
         /// Because this pallet emits events, it depends on the runtime's definition of an event.
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
@@ -62,25 +61,25 @@ pub mod pallet {
 
     #[pallet::storage]
     #[pallet::getter(fn relation_id_cards)]
-    /// 账户和身份证关联关系 RelationType u8
-    pub type RelationIdCards<T: Config> = StorageDoubleMap<_, Twox64Concat, T::AccountId, Twox64Concat, T::RelationType, PersonInfo>;
+    /// 账户和亲属关联关系
+    pub type Relations<T: Config> = StorageDoubleMap<_, Twox64Concat, T::AccountId, Twox64Concat, T::RelationType, PersonInfo>;
 
     #[pallet::event]
     #[pallet::metadata(T::AccountId = "AccountId")]
     #[pallet::generate_deposit(pub (super) fn deposit_event)]
     pub enum Event<T: Config> {
-        /// Event documentation should end with an array that provides descriptive names for event
-        /// parameters. [something, who]
-        SomethingStored(u32, T::AccountId),
+        /// 帐号绑定亲属信息成功. [who, PersonInfo]
+        RelationStored(T::AccountId, T::RelationType, PersonInfo),
     }
 
     // Errors inform users that something went wrong.
     #[pallet::error]
     pub enum Error<T> {
-        /// Error names should be descriptive.
+        /// 必填字段不能为空
         NoneValue,
-        /// Errors should have helpful documentation associated with them.
+        /// 存储越界
         StorageOverflow,
+        /// json格式数据转换异常
         JsonParamError,
     }
 
@@ -89,12 +88,11 @@ pub mod pallet {
 
     #[pallet::call]
     impl<T: Config> Pallet<T> {
-        /// 绑定亲属信息
+        /// 绑定亲属信息 json方式
         #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
         pub fn bind(origin: OriginFor<T>, relation_type: T::RelationType, json: Vec<u8>) -> DispatchResultWithPostInfo {
-            let _sender = ensure_signed(origin)?;
-            // let data1 = str::from_utf8(&json).map_err(|_| <Error<T>>::JsonParamError)?;
-            // let data1 = String::from_utf8(json).map_err(|_| <Error<T>>::JsonParamError)?;
+            let sender = ensure_signed(origin)?;
+            /*
             let data = r#"
             {
                 "name": "luffy",
@@ -104,8 +102,32 @@ pub mod pallet {
                 "chronic": "123456"
             }"#;
             let ps_info: PersonInfo = serde_json::from_str(&data).map_err(|_| <Error<T>>::JsonParamError)?;
-            RelationIdCards::<T>::insert(&_sender, relation_type, ps_info);
+            */
+            // let ps_info: PersonInfo = serde_json::from_slice(&json).unwrap();
+            // 检查json格式是否合法，不合法抛出异常
+            let ps_info: PersonInfo = serde_json::from_slice(&json).map_err(|_| <Error<T>>::JsonParamError)?;
+            Relations::<T>::insert(&sender, relation_type, &ps_info);
+            // 发布绑定成功事件
+            Self::deposit_event(Event::RelationStored(sender, relation_type, ps_info));
+            Ok(().into())
+        }
+
+        /// 绑定亲属信息 struct方式
+        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        pub fn bind_info(origin: OriginFor<T>, relation_type: T::RelationType, ps_info: PersonInfo) -> DispatchResultWithPostInfo {
+            let sender = ensure_signed(origin)?;
+            Relations::<T>::insert(&sender, relation_type, &ps_info);
+            // 发布绑定成功事件
+            Self::deposit_event(Event::RelationStored(sender, relation_type, ps_info));
             Ok(().into())
         }
     }
 }
+
+impl<T: Config> Pallet<T> {
+    /// 账户是否绑定种亲属关系
+    pub fn relation_stored(owner: &T::AccountId, relation_type: &T::RelationType) -> bool {
+        return Relations::<T>::contains_key(owner, relation_type);
+    }
+}
+
