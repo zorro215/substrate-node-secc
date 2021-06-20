@@ -42,6 +42,7 @@ pub fn de_string_to_bytes<'de, D>(de: D) -> Result<Vec<u8>, D::Error>
 pub mod pallet {
     use frame_support::pallet_prelude::*;
     use frame_system::pallet_prelude::*;
+    use sp_std::str;
 
     use super::*;
 
@@ -101,6 +102,7 @@ pub mod pallet {
                 "weight": 43,
                 "chronic": "123456"
             }"#;
+            let data = str::from_utf8(&json).map_err(|_| <Error<T>>::JsonParamError)?;
             let ps_info: PersonInfo = serde_json::from_str(&data).map_err(|_| <Error<T>>::JsonParamError)?;
             */
             // let ps_info: PersonInfo = serde_json::from_slice(&json).unwrap();
