@@ -43,8 +43,8 @@ pub mod pallet {
     use frame_support::pallet_prelude::*;
     use frame_system::pallet_prelude::*;
     use sp_std::str;
-
     use super::*;
+    use frame_system::ensure_root;
 
     /// Configure the pallet by specifying the parameters and types on which it depends.
     #[pallet::config]
@@ -61,9 +61,14 @@ pub mod pallet {
 
 
     #[pallet::storage]
-    #[pallet::getter(fn relation_id_cards)]
+    #[pallet::getter(fn relation_persion)]
     /// 账户和亲属关联关系
     pub type Relations<T: Config> = StorageDoubleMap<_, Twox64Concat, T::AccountId, Twox64Concat, T::RelationType, PersonInfo>;
+
+    #[pallet::storage]
+    #[pallet::getter(fn chronic_taboo)]
+    /// 慢性病禁忌菜品
+    pub type ChronicTaboos<T: Config> = StorageMap<_, Twox64Concat, u16, Vec<u8>>;
 
     #[pallet::event]
     #[pallet::metadata(T::AccountId = "AccountId")]
@@ -71,6 +76,8 @@ pub mod pallet {
     pub enum Event<T: Config> {
         /// 帐号绑定亲属信息成功. [who, PersonInfo]
         RelationStored(T::AccountId, T::RelationType, PersonInfo),
+        /// 绑定慢性病禁忌菜品. [Chronic, TabooFoods]
+        ChronicTabooFoods(u16, Vec<u8>),
     }
 
     // Errors inform users that something went wrong.
@@ -82,6 +89,10 @@ pub mod pallet {
         StorageOverflow,
         /// json格式数据转换异常
         JsonParamError,
+        /// 帐号没有绑定亲属关系
+        RelationIsNotStored,
+        /// 不是root
+        IsNotRoot,
     }
 
     #[pallet::hooks]
@@ -121,6 +132,18 @@ pub mod pallet {
             Relations::<T>::insert(&sender, relation_type, &ps_info);
             // 发布绑定成功事件
             Self::deposit_event(Event::RelationStored(sender, relation_type, ps_info));
+            Ok(().into())
+        }
+
+        /// 保存慢性病禁忌菜品 root用户
+        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        pub fn save_taboo_foods(origin: OriginFor<T>, chronic: u16, food: Vec<u8>) -> DispatchResultWithPostInfo {
+            // let sender = ensure_signed(origin)?;
+            // 只有root可以保持
+            ensure_root(origin)?;
+            ChronicTaboos::<T>::insert(&chronic, &food);
+            // 发布慢性病和禁忌菜品关联
+            Self::deposit_event(Event::ChronicTabooFoods(chronic, food));
             Ok(().into())
         }
     }
