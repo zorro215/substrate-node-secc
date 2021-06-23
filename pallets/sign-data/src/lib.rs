@@ -50,9 +50,9 @@ pub mod pallet {
 
     #[pallet::error]
     pub enum Error<T> {
-        /// Error names should be descriptive.
+        /// 空值异常
         NoneValue,
-        /// Errors should have helpful documentation associated with them.
+        /// 值越界
         StorageOverflow,
         /// 帐号没有绑定亲属关系
         RelationIsNotStored,
