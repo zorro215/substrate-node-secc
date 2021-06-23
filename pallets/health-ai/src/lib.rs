@@ -76,15 +76,19 @@ pub mod pallet {
     pub enum Event<T: Config> {
         /// 帐号绑定亲属信息成功. [who, PersonInfo]
         RelationStored(T::AccountId, T::RelationType, PersonInfo),
+        /// 帐号解除绑定亲属信息. [who, RelationType]
+        RelationUnbind(T::AccountId, T::RelationType),
         /// 绑定慢性病禁忌菜品. [Chronic, TabooFoods]
-        ChronicTabooFoods(u16, Vec<u8>),
+        ChronicTabooFoodsStored(u16, Vec<u8>),
+        /// 移除慢性病禁忌菜品. [Chronic]
+        ChronicTabooFoodsRemoved(u16),
     }
 
     // Errors inform users that something went wrong.
     #[pallet::error]
     pub enum Error<T> {
-        /// 必填字段不能为空
-        NoneValue,
+        /// 没有绑定关系
+        NoSuchRelation,
         /// 存储越界
         StorageOverflow,
         /// json格式数据转换异常
@@ -93,6 +97,8 @@ pub mod pallet {
         RelationIsNotStored,
         /// 不是root
         IsNotRoot,
+        /// 没有慢性病禁忌菜品
+        NoSuchTabooFoods,
     }
 
     #[pallet::hooks]
@@ -119,7 +125,7 @@ pub mod pallet {
             // let ps_info: PersonInfo = serde_json::from_slice(&json).unwrap();
             // 检查json格式是否合法，不合法抛出异常
             let ps_info: PersonInfo = serde_json::from_slice(&json).map_err(|_| <Error<T>>::JsonParamError)?;
-            Relations::<T>::insert(&sender, relation_type, &ps_info);
+            Relations::<T>::insert(&sender, &relation_type, &ps_info);
             // 发布绑定成功事件
             Self::deposit_event(Event::RelationStored(sender, relation_type, ps_info));
             Ok(().into())
@@ -129,9 +135,21 @@ pub mod pallet {
         #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
         pub fn bind_info(origin: OriginFor<T>, relation_type: T::RelationType, ps_info: PersonInfo) -> DispatchResultWithPostInfo {
             let sender = ensure_signed(origin)?;
-            Relations::<T>::insert(&sender, relation_type, &ps_info);
+            Relations::<T>::insert(&sender, &relation_type, &ps_info);
             // 发布绑定成功事件
             Self::deposit_event(Event::RelationStored(sender, relation_type, ps_info));
+            Ok(().into())
+        }
+
+        /// 解除绑定亲属信息
+        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        pub fn unbind(origin: OriginFor<T>, relation_type: T::RelationType) -> DispatchResultWithPostInfo {
+            let sender = ensure_signed(origin)?;
+            ensure!(Relations::<T>::contains_key(&sender,&relation_type), Error::<T>::NoSuchRelation);
+
+            Relations::<T>::remove(&sender, &relation_type);
+            // 发布解除绑定事件
+            Self::deposit_event(Event::RelationUnbind(sender, relation_type));
             Ok(().into())
         }
 
@@ -143,7 +161,20 @@ pub mod pallet {
             ensure_root(origin)?;
             ChronicTaboos::<T>::insert(&chronic, &food);
             // 发布慢性病和禁忌菜品关联
-            Self::deposit_event(Event::ChronicTabooFoods(chronic, food));
+            Self::deposit_event(Event::ChronicTabooFoodsStored(chronic, food));
+            Ok(().into())
+        }
+
+        /// 删除慢性病禁忌菜品 root用户
+        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        pub fn remove_taboo_foods(origin: OriginFor<T>, chronic: u16) -> DispatchResultWithPostInfo {
+            // let sender = ensure_signed(origin)?;
+            // 只有root可以保持
+            ensure_root(origin)?;
+            ensure!(ChronicTaboos::<T>::contains_key(&chronic), Error::<T>::NoSuchTabooFoods);
+            ChronicTaboos::<T>::remove(&chronic);
+            // 发布慢性病和禁忌菜品关联
+            Self::deposit_event(Event::ChronicTabooFoodsRemoved(chronic));
             Ok(().into())
         }
     }

@@ -19,7 +19,7 @@ pub mod pallet {
 
     /// Configure the pallet by specifying the parameters and types on which it depends.
     #[pallet::config]
-    pub trait Config: frame_system::Config +pallet_health_ai::Config {
+    pub trait Config: frame_system::Config + pallet_health_ai::Config {
         /// 设备类型 1:手环 2:床垫 3:血糖仪 4:血压计 5:体温计 6:跌倒报警 7:电子围栏 8:其他
         type DeviceType: Parameter + Member + Default + Copy;
         /// 关系 1:本人 2:父亲 3:母亲 3:岳父 4:岳母 9:其他 因为亲属关系太多，就不用枚举了，前后端约定即可
@@ -42,8 +42,10 @@ pub mod pallet {
     #[pallet::metadata(T::AccountId = "AccountId")]
     #[pallet::generate_deposit(pub (super) fn deposit_event)]
     pub enum Event<T: Config> {
-        /// 帐号绑定亲属信息成功. [who, relation,sn]
-        RelationDeviceStored(T::AccountId, (T::RelationType,T::DeviceType), Vec<u8>),
+        /// 帐号绑定亲属设备成功. [who, relation,sn]
+        RelationDeviceStored(T::AccountId, (T::RelationType, T::DeviceType), Vec<u8>),
+        /// 帐号解绑亲属信息成功. [who, relation]
+        RelationDeviceUnbind(T::AccountId, (T::RelationType, T::DeviceType)),
     }
 
     #[pallet::error]
@@ -54,6 +56,8 @@ pub mod pallet {
         StorageOverflow,
         /// 帐号没有绑定亲属关系
         RelationIsNotStored,
+        /// 帐号没有绑定亲属设备
+        RelationDeviceIsNotStored,
     }
 
     #[pallet::hooks]
@@ -73,9 +77,18 @@ pub mod pallet {
             Self::deposit_event(Event::RelationDeviceStored(sender, (relation_type, device_type), sn));
             Ok(().into())
         }
+
+        /// 解除绑定亲属设备
+        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        pub fn unbind(origin: OriginFor<T>, relation_type: T::RelationType, device_type: T::DeviceType) -> DispatchResultWithPostInfo {
+            let sender = ensure_signed(origin)?;
+            ensure!(OwnedDevices::<T>::contains_key(&sender,(&relation_type, &device_type)), Error::<T>::RelationDeviceIsNotStored);
+            OwnedDevices::<T>::remove(&sender, (&relation_type, &device_type));
+            // 发布解除绑定事件
+            Self::deposit_event(Event::RelationDeviceUnbind(sender, (relation_type, device_type)));
+            Ok(().into())
+        }
     }
 }
 
-impl<T: Config + pallet_health_ai::Config> Pallet<T> {
-
-}
+impl<T: Config + pallet_health_ai::Config> Pallet<T> {}
