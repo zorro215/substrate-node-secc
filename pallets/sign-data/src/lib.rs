@@ -1,5 +1,9 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
+use codec::{Decode, Encode};
+use serde::{Deserialize, Deserializer, Serialize};
+use sp_std::vec::Vec;
+
 pub use pallet::*;
 
 #[cfg(test)]
@@ -11,11 +15,72 @@ mod tests;
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 
+#[derive(Debug, Serialize, Deserialize, Encode, Decode, Default, Clone, PartialEq)]
+///手环数据对象
+pub struct WristbandInfo {
+    #[serde(deserialize_with = "de_string_to_bytes")]
+    data_id: Vec<u8>,
+    //第三方系统数据id
+    #[serde(deserialize_with = "de_string_to_bytes")]
+    device_no: Vec<u8>,
+    //设备编号
+    heart_rate: u8,
+    //心率
+    #[serde(deserialize_with = "de_string_to_bytes")]
+    data_time: Vec<u8>,
+    //数据产生时间
+}
+
+#[derive(Debug, Serialize, Deserialize, Encode, Decode, Default, Clone, PartialEq)]
+///睡眠报告数据
+pub struct SleepReportInfo {
+    #[serde(deserialize_with = "de_string_to_bytes")]
+    data_id: Vec<u8>,
+    //第三方系统数据id
+    #[serde(deserialize_with = "de_string_to_bytes")]
+    device_no: Vec<u8>,
+    //设备编号
+    deep_sleep: u8,
+    //深睡时长
+    light_sleep: u8,
+    //浅睡时长
+    #[serde(deserialize_with = "de_string_to_bytes")]
+    data_time: Vec<u8>,
+    //数据产生时间
+}
+
+
+#[derive(Debug, Serialize, Deserialize, Encode, Decode, Default, Clone, PartialEq)]
+///睡眠体征数据
+pub struct SleepSignInfo {
+    #[serde(deserialize_with = "de_string_to_bytes")]
+    data_id: Vec<u8>,
+    //第三方系统数据id
+    #[serde(deserialize_with = "de_string_to_bytes")]
+    device_no: Vec<u8>,
+    //设备编号
+    heart_rate: u8,
+    //心率
+    breath_rate: u8,
+    //呼吸率
+    #[serde(deserialize_with = "de_string_to_bytes")]
+    data_time: Vec<u8>,
+    //数据产生时间
+}
+
+pub fn de_string_to_bytes<'de, D>(de: D) -> Result<Vec<u8>, D::Error>
+    where D: Deserializer<'de> {
+    let s: &str = Deserialize::deserialize(de)?;
+    Ok(s.as_bytes().to_vec())
+}
+
 #[frame_support::pallet]
 pub mod pallet {
-    use frame_support::{dispatch::DispatchResultWithPostInfo, pallet_prelude::*};
+    use frame_support::pallet_prelude::*;
     use frame_system::pallet_prelude::*;
-    use sp_std::vec::Vec;
+    use sp_std::str;
+
+    use super::*;
 
     /// Configure the pallet by specifying the parameters and types on which it depends.
     #[pallet::config]
@@ -38,6 +103,28 @@ pub mod pallet {
     /// 账户和设备关联关系 DeviceType u8
     pub type OwnedDevices<T: Config> = StorageDoubleMap<_, Twox64Concat, T::AccountId, Twox64Concat, (T::RelationType, T::DeviceType), Vec<u8>>;
 
+
+    #[pallet::storage]
+    #[pallet::getter(fn wristband_infos)]
+    /// 手环数据 data_id
+    pub type WristbandInfos<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, (WristbandInfo, T::BlockNumber)>;
+
+    #[pallet::storage]
+    #[pallet::getter(fn sleep_report_infos)]
+    /// 睡眠报告数据 data_id
+    pub type SleepReportInfos<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, (SleepReportInfo, T::BlockNumber)>;
+
+    #[pallet::storage]
+    #[pallet::getter(fn sleep_sign_infos)]
+    /// 睡眠体征数据 data_id
+    pub type SleepSignInfos<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, (SleepSignInfo, T::BlockNumber)>;
+
+
+    #[pallet::storage]
+    #[pallet::getter(fn medical_infos)]
+    /// 体检报告文件数据存证 file_hash ipfs哈希值 id_card 身份证号
+    pub type MedicalInfos<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, (Vec<u8>, T::BlockNumber)>;
+
     #[pallet::event]
     #[pallet::metadata(T::AccountId = "AccountId")]
     #[pallet::generate_deposit(pub (super) fn deposit_event)]
@@ -46,6 +133,14 @@ pub mod pallet {
         RelationDeviceStored(T::AccountId, (T::RelationType, T::DeviceType), Vec<u8>),
         /// 帐号解绑亲属信息成功. [who, relation]
         RelationDeviceUnbind(T::AccountId, (T::RelationType, T::DeviceType)),
+        /// 手环数据保存成功. [data,blockNumber]
+        WristbandInfoStored(WristbandInfo, T::BlockNumber),
+        /// 睡眠报告数据保存成功. [data,blockNumber]
+        SleepReportInfoStored(SleepReportInfo, T::BlockNumber),
+        /// 手环数据保存成功. [data,blockNumber]
+        SleepSignInfoStored(SleepSignInfo, T::BlockNumber),
+        /// 体检报告文件数据存证成功.[file_hash, id_card, current_block]
+        MedicalInfoStored(Vec<u8>, Vec<u8>, T::BlockNumber),
     }
 
     #[pallet::error]
@@ -58,6 +153,8 @@ pub mod pallet {
         RelationIsNotStored,
         /// 帐号没有绑定亲属设备
         RelationDeviceIsNotStored,
+        /// json格式数据转换异常
+        JsonParamError,
     }
 
     #[pallet::hooks]
@@ -86,6 +183,75 @@ pub mod pallet {
             OwnedDevices::<T>::remove(&sender, (&relation_type, &device_type));
             // 发布解除绑定事件
             Self::deposit_event(Event::RelationDeviceUnbind(sender, (relation_type, device_type)));
+            Ok(().into())
+        }
+
+        /// 保存手环心率数据
+        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        pub fn save_wristband_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
+            let sender = ensure_signed(origin)?;
+            //TODO 判断只能是Bob才能提交数据
+
+            // 检查json格式是否合法，不合法抛出异常
+            let data: WristbandInfo = serde_json::from_slice(&json).map_err(|_| <Error<T>>::JsonParamError)?;
+            // 到到数据主键id
+            let data_id = &data.data_id;
+            // Get the block number from the FRAME System module.
+            let current_block = <frame_system::Module<T>>::block_number();
+            WristbandInfos::<T>::insert(data_id, (&data, &current_block));
+            // 发布绑定成功事件
+            Self::deposit_event(Event::WristbandInfoStored(data, current_block));
+            Ok(().into())
+        }
+
+        /// 保存睡眠报告数据
+        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        pub fn save_sleep_report_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
+            let sender = ensure_signed(origin)?;
+            //TODO 判断只能是Bob才能提交数据
+
+            // 检查json格式是否合法，不合法抛出异常
+            let data: SleepReportInfo = serde_json::from_slice(&json).map_err(|_| <Error<T>>::JsonParamError)?;
+            // 到到数据主键id
+            let data_id = &data.data_id;
+            // Get the block number from the FRAME System module.
+            let current_block = <frame_system::Module<T>>::block_number();
+            SleepReportInfos::<T>::insert(data_id, (&data, &current_block));
+            // 发布绑定成功事件
+            Self::deposit_event(Event::SleepReportInfoStored(data, current_block));
+            Ok(().into())
+        }
+
+        /// 保存睡眠体征数据
+        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        pub fn save_sleep_sign_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
+            let sender = ensure_signed(origin)?;
+            //TODO 判断只能是Bob才能提交数据
+
+            // 检查json格式是否合法，不合法抛出异常
+            let data: SleepSignInfo = serde_json::from_slice(&json).map_err(|_| <Error<T>>::JsonParamError)?;
+            // 到到数据主键id
+            let data_id = &data.data_id;
+            // Get the block number from the FRAME System module.
+            let current_block = <frame_system::Module<T>>::block_number();
+            SleepSignInfos::<T>::insert(data_id, (&data, &current_block));
+            // 发布绑定成功事件
+            Self::deposit_event(Event::SleepSignInfoStored(data, current_block));
+            Ok(().into())
+        }
+
+
+        /// 体检报告文件数据链上存证
+        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        pub fn save_medical_info(origin: OriginFor<T>, file_hash: Vec<u8>, id_card: Vec<u8>) -> DispatchResultWithPostInfo {
+            let sender = ensure_signed(origin)?;
+            //TODO 判断只能是Bob才能提交数据
+
+            // Get the block number from the FRAME System module.
+            let current_block = <frame_system::Module<T>>::block_number();
+            MedicalInfos::<T>::insert(&file_hash, (&id_card, &current_block));
+            // 发布绑定成功事件
+            Self::deposit_event(Event::MedicalInfoStored(file_hash, id_card, current_block));
             Ok(().into())
         }
     }
