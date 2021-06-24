@@ -24,7 +24,7 @@ pub struct WristbandInfo {
     #[serde(deserialize_with = "de_string_to_bytes")]
     device_no: Vec<u8>,
     //设备编号
-    heart_rate: u8,
+    heart_rate: u16,
     //心率
     #[serde(deserialize_with = "de_string_to_bytes")]
     data_time: Vec<u8>,
