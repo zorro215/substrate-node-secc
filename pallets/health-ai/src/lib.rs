@@ -17,13 +17,15 @@ mod benchmarking;
 
 #[derive(Debug, Serialize, Deserialize, Encode, Decode, Default, Clone, PartialEq)]
 ///绑定对象信息
-pub struct PersonInfo {
+pub struct PersonInfo<RelationType> {
     #[serde(deserialize_with = "de_string_to_bytes")]
     name: Vec<u8>,
     //姓名
     #[serde(deserialize_with = "de_string_to_bytes")]
     id_card: Vec<u8>,
     //身份证号码
+    relation_type: RelationType,
+    //亲属关系
     height: u16,
     //身高 mm
     weight: u16,
@@ -41,10 +43,11 @@ pub fn de_string_to_bytes<'de, D>(de: D) -> Result<Vec<u8>, D::Error>
 #[frame_support::pallet]
 pub mod pallet {
     use frame_support::pallet_prelude::*;
+    use frame_system::ensure_root;
     use frame_system::pallet_prelude::*;
     use sp_std::str;
+
     use super::*;
-    use frame_system::ensure_root;
 
     /// Configure the pallet by specifying the parameters and types on which it depends.
     #[pallet::config]
@@ -63,8 +66,11 @@ pub mod pallet {
     #[pallet::storage]
     #[pallet::getter(fn relation_persion)]
     /// 账户和亲属关联关系
-    pub type Relations<T: Config> = StorageDoubleMap<_, Twox64Concat, T::AccountId, Twox64Concat, T::RelationType, PersonInfo>;
-
+    pub type Relations<T: Config> = StorageDoubleMap<_, Twox64Concat, T::AccountId, Twox64Concat, T::RelationType, PersonInfo<T::RelationType>>;
+    #[pallet::storage]
+    #[pallet::getter(fn ac_relation_persion)]
+    /// 账户绑定亲属列表
+    pub type AcRelations<T: Config> = StorageMap<_, Twox64Concat, T::AccountId, Vec<PersonInfo<T::RelationType>>>;
     #[pallet::storage]
     #[pallet::getter(fn chronic_taboo)]
     /// 慢性病禁忌菜品
@@ -75,7 +81,7 @@ pub mod pallet {
     #[pallet::generate_deposit(pub (super) fn deposit_event)]
     pub enum Event<T: Config> {
         /// 帐号绑定亲属信息成功. [who, PersonInfo]
-        RelationStored(T::AccountId, T::RelationType, PersonInfo),
+        RelationStored(T::AccountId, T::RelationType, PersonInfo<T::RelationType>),
         /// 帐号解除绑定亲属信息. [who, RelationType]
         RelationUnbind(T::AccountId, T::RelationType),
         /// 绑定慢性病禁忌菜品. [Chronic, TabooFoods]
@@ -106,36 +112,14 @@ pub mod pallet {
 
     #[pallet::call]
     impl<T: Config> Pallet<T> {
-        /// 绑定亲属信息 json方式
-        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-        pub fn bind(origin: OriginFor<T>, relation_type: T::RelationType, json: Vec<u8>) -> DispatchResultWithPostInfo {
-            let sender = ensure_signed(origin)?;
-            /*
-            let data = r#"
-            {
-                "name": "luffy",
-                "id_card": "43",
-                "height": 43,
-                "weight": 43,
-                "chronic": "123456"
-            }"#;
-            let data = str::from_utf8(&json).map_err(|_| <Error<T>>::JsonParamError)?;
-            let ps_info: PersonInfo = serde_json::from_str(&data).map_err(|_| <Error<T>>::JsonParamError)?;
-            */
-            // let ps_info: PersonInfo = serde_json::from_slice(&json).unwrap();
-            // 检查json格式是否合法，不合法抛出异常
-            let ps_info: PersonInfo = serde_json::from_slice(&json).map_err(|_| <Error<T>>::JsonParamError)?;
-            Relations::<T>::insert(&sender, &relation_type, &ps_info);
-            // 发布绑定成功事件
-            Self::deposit_event(Event::RelationStored(sender, relation_type, ps_info));
-            Ok(().into())
-        }
-
         /// 绑定亲属信息 struct方式
         #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-        pub fn bind_info(origin: OriginFor<T>, relation_type: T::RelationType, ps_info: PersonInfo) -> DispatchResultWithPostInfo {
+        pub fn bind(origin: OriginFor<T>, relation_type: T::RelationType, mut ps_info: PersonInfo<T::RelationType>) -> DispatchResultWithPostInfo {
             let sender = ensure_signed(origin)?;
+            ps_info.relation_type = relation_type;
             Relations::<T>::insert(&sender, &relation_type, &ps_info);
+            let members = Relations::<T>::iter_prefix_values(&sender).collect::<Vec<_>>();
+            AcRelations::<T>::insert(&sender, members);
             // 发布绑定成功事件
             Self::deposit_event(Event::RelationStored(sender, relation_type, ps_info));
             Ok(().into())
@@ -148,6 +132,8 @@ pub mod pallet {
             ensure!(Relations::<T>::contains_key(&sender,&relation_type), Error::<T>::NoSuchRelation);
 
             Relations::<T>::remove(&sender, &relation_type);
+            let members = Relations::<T>::iter_prefix_values(&sender).collect::<Vec<_>>();
+            AcRelations::<T>::insert(&sender, members);
             // 发布解除绑定事件
             Self::deposit_event(Event::RelationUnbind(sender, relation_type));
             Ok(().into())
