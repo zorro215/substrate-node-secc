@@ -189,7 +189,7 @@ pub mod pallet {
         /// 保存手环心率数据
         #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
         pub fn save_wristband_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
-            let sender = ensure_signed(origin)?;
+            // let sender = ensure_signed(origin)?;
             //TODO 判断只能是Bob才能提交数据
 
             // 检查json格式是否合法，不合法抛出异常
@@ -207,7 +207,7 @@ pub mod pallet {
         /// 保存睡眠报告数据
         #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
         pub fn save_sleep_report_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
-            let sender = ensure_signed(origin)?;
+            // let sender = ensure_signed(origin)?;
             //TODO 判断只能是Bob才能提交数据
 
             // 检查json格式是否合法，不合法抛出异常
@@ -225,7 +225,7 @@ pub mod pallet {
         /// 保存睡眠体征数据
         #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
         pub fn save_sleep_sign_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
-            let sender = ensure_signed(origin)?;
+            // let sender = ensure_signed(origin)?;
             //TODO 判断只能是Bob才能提交数据
 
             // 检查json格式是否合法，不合法抛出异常
@@ -244,7 +244,7 @@ pub mod pallet {
         /// 体检报告文件数据链上存证
         #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
         pub fn save_medical_info(origin: OriginFor<T>, file_hash: Vec<u8>, id_card: Vec<u8>) -> DispatchResultWithPostInfo {
-            let sender = ensure_signed(origin)?;
+            // let sender = ensure_signed(origin)?;
             //TODO 判断只能是Bob才能提交数据
 
             // Get the block number from the FRAME System module.
