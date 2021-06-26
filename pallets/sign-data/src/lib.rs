@@ -15,6 +15,7 @@ mod tests;
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 
+
 #[derive(Debug, Serialize, Deserialize, Encode, Decode, Default, Clone, PartialEq)]
 ///手环数据对象
 pub struct WristbandInfo {
@@ -101,8 +102,12 @@ pub mod pallet {
     #[pallet::storage]
     #[pallet::getter(fn owned_devices)]
     /// 账户和设备关联关系 DeviceType u8
-    pub type OwnedDevices<T: Config> = StorageDoubleMap<_, Twox64Concat, T::AccountId, Twox64Concat, (T::RelationType, T::DeviceType), Vec<u8>>;
+    pub type OwnedDevices<T: Config> = StorageDoubleMap<_, Twox64Concat, (T::AccountId, T::RelationType), Twox64Concat, T::DeviceType, Vec<u8>>;
 
+    #[pallet::storage]
+    #[pallet::getter(fn ac_owned_devices)]
+    /// 账户绑定的设备数据
+    pub type AcOwnedDevices<T: Config> = StorageMap<_, Twox64Concat, (T::AccountId, T::RelationType), Vec<(T::DeviceType, Vec<u8>)>>;
 
     #[pallet::storage]
     #[pallet::getter(fn wristband_infos)]
@@ -129,10 +134,10 @@ pub mod pallet {
     #[pallet::metadata(T::AccountId = "AccountId")]
     #[pallet::generate_deposit(pub (super) fn deposit_event)]
     pub enum Event<T: Config> {
-        /// 帐号绑定亲属设备成功. [who, relation,sn]
-        RelationDeviceStored(T::AccountId, (T::RelationType, T::DeviceType), Vec<u8>),
-        /// 帐号解绑亲属信息成功. [who, relation]
-        RelationDeviceUnbind(T::AccountId, (T::RelationType, T::DeviceType)),
+        /// 帐号绑定亲属设备成功. [who,relationType,deviceType,sn]
+        RelationDeviceStored(T::AccountId, T::RelationType, T::DeviceType, Vec<u8>),
+        /// 帐号解绑亲属信息成功. [who,relationType,deviceType]
+        RelationDeviceUnbind(T::AccountId, T::RelationType, T::DeviceType),
         /// 手环数据保存成功. [data,blockNumber]
         WristbandInfoStored(WristbandInfo, T::BlockNumber),
         /// 睡眠报告数据保存成功. [data,blockNumber]
@@ -170,8 +175,10 @@ pub mod pallet {
             let is_stored = pallet_health_ai::Module::<T>::relation_stored(&sender, &relation_type);
             //  检查是否已经绑定过亲属
             ensure!(is_stored, Error::<T>::RelationIsNotStored);
-            OwnedDevices::<T>::insert(&sender, (relation_type, device_type), &sn);
-            Self::deposit_event(Event::RelationDeviceStored(sender, (relation_type, device_type), sn));
+            OwnedDevices::<T>::insert((&sender, &relation_type), &device_type, &sn);
+            let devices = OwnedDevices::<T>::iter_prefix((&sender, &relation_type)).collect::<Vec<_>>();
+            AcOwnedDevices::<T>::insert((&sender, &relation_type), devices);
+            Self::deposit_event(Event::RelationDeviceStored(sender, relation_type, device_type, sn));
             Ok(().into())
         }
 
@@ -179,10 +186,10 @@ pub mod pallet {
         #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
         pub fn unbind(origin: OriginFor<T>, relation_type: T::RelationType, device_type: T::DeviceType) -> DispatchResultWithPostInfo {
             let sender = ensure_signed(origin)?;
-            ensure!(OwnedDevices::<T>::contains_key(&sender,(&relation_type, &device_type)), Error::<T>::RelationDeviceIsNotStored);
-            OwnedDevices::<T>::remove(&sender, (&relation_type, &device_type));
+            ensure!(OwnedDevices::<T>::contains_key((&sender,&relation_type),&device_type), Error::<T>::RelationDeviceIsNotStored);
+            OwnedDevices::<T>::remove((&sender, &relation_type), &device_type);
             // 发布解除绑定事件
-            Self::deposit_event(Event::RelationDeviceUnbind(sender, (relation_type, device_type)));
+            Self::deposit_event(Event::RelationDeviceUnbind(sender, relation_type, device_type));
             Ok(().into())
         }
 

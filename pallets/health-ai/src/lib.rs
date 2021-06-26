@@ -117,6 +117,7 @@ pub mod pallet {
         pub fn bind(origin: OriginFor<T>, relation_type: T::RelationType, mut ps_info: PersonInfo<T::RelationType>) -> DispatchResultWithPostInfo {
             let sender = ensure_signed(origin)?;
             ps_info.relation_type = relation_type;
+            // TODO 判断有没有绑定过设备
             Relations::<T>::insert(&sender, &relation_type, &ps_info);
             let members = Relations::<T>::iter_prefix_values(&sender).collect::<Vec<_>>();
             AcRelations::<T>::insert(&sender, members);
@@ -134,6 +135,7 @@ pub mod pallet {
             Relations::<T>::remove(&sender, &relation_type);
             let members = Relations::<T>::iter_prefix_values(&sender).collect::<Vec<_>>();
             AcRelations::<T>::insert(&sender, members);
+            // TODO  解绑设备关系
             // 发布解除绑定事件
             Self::deposit_event(Event::RelationUnbind(sender, relation_type));
             Ok(().into())
