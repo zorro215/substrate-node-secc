@@ -169,7 +169,7 @@ pub mod pallet {
     #[pallet::call]
     impl<T: Config> Pallet<T> {
         /// 绑定亲属设备
-        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        #[pallet::weight(300_000 + T::DbWeight::get().writes(3))]
         pub fn
         bind(origin: OriginFor<T>, relation_type: T::RelationType, device_type: T::DeviceType, sn: Vec<u8>) -> DispatchResultWithPostInfo {
             let sender = ensure_signed(origin)?;
@@ -184,7 +184,7 @@ pub mod pallet {
         }
 
         /// 解除绑定亲属设备
-        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        #[pallet::weight(500_000 + T::DbWeight::get().writes(5))]
         pub fn unbind(origin: OriginFor<T>, relation_type: T::RelationType, device_type: T::DeviceType) -> DispatchResultWithPostInfo {
             let sender = ensure_signed(origin)?;
             ensure!(OwnedDevices::<T>::contains_key((&sender,&relation_type),&device_type), Error::<T>::RelationDeviceIsNotStored);
@@ -195,7 +195,7 @@ pub mod pallet {
         }
 
         /// 保存手环心率数据
-        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        #[pallet::weight(200_000 + T::DbWeight::get().writes(2))]
         pub fn save_wristband_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
             let _sender = ensure_signed(origin)?;
             //TODO 判断只能是Bob才能提交数据
@@ -213,7 +213,7 @@ pub mod pallet {
         }
 
         /// 保存睡眠报告数据
-        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        #[pallet::weight(20_000 + T::DbWeight::get().writes(2))]
         pub fn save_sleep_report_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
             let _sender = ensure_signed(origin)?;
             //TODO 判断只能是Bob才能提交数据
@@ -231,7 +231,7 @@ pub mod pallet {
         }
 
         /// 保存睡眠体征数据
-        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        #[pallet::weight(20_000 + T::DbWeight::get().writes(2))]
         pub fn save_sleep_sign_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
             let _sender = ensure_signed(origin)?;
             //TODO 判断只能是Bob才能提交数据
@@ -250,7 +250,7 @@ pub mod pallet {
 
 
         /// 体检报告文件数据链上存证
-        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        #[pallet::weight(700_000 + T::DbWeight::get().writes(7))]
         pub fn save_medical_info(origin: OriginFor<T>, file_hash: Vec<u8>, id_card: Vec<u8>) -> DispatchResultWithPostInfo {
             let _sender = ensure_signed(origin)?;
             //TODO 判断只能是Bob才能提交数据

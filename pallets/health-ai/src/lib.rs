@@ -113,7 +113,7 @@ pub mod pallet {
     #[pallet::call]
     impl<T: Config> Pallet<T> {
         /// 绑定亲属信息 struct方式
-        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        #[pallet::weight(300_000 + T::DbWeight::get().writes(3))]
         pub fn bind(origin: OriginFor<T>, relation_type: T::RelationType, mut ps_info: PersonInfo<T::RelationType>) -> DispatchResultWithPostInfo {
             let sender = ensure_signed(origin)?;
             ps_info.relation_type = relation_type;
@@ -126,7 +126,7 @@ pub mod pallet {
         }
 
         /// 解除绑定亲属信息
-        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        #[pallet::weight(50_000 + T::DbWeight::get().writes(5))]
         pub fn unbind(origin: OriginFor<T>, relation_type: T::RelationType) -> DispatchResultWithPostInfo {
             let sender = ensure_signed(origin)?;
             ensure!(Relations::<T>::contains_key(&sender,&relation_type), Error::<T>::NoSuchRelation);
@@ -140,7 +140,7 @@ pub mod pallet {
         }
 
         /// 保存慢性病禁忌菜品 root用户
-        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        #[pallet::weight(200_000 + T::DbWeight::get().writes(2))]
         pub fn save_taboo_foods(origin: OriginFor<T>, chronic: u16, food: Vec<u8>) -> DispatchResultWithPostInfo {
             // let sender = ensure_signed(origin)?;
             // 只有root可以保持
@@ -152,7 +152,7 @@ pub mod pallet {
         }
 
         /// 删除慢性病禁忌菜品 root用户
-        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        #[pallet::weight(200_000 + T::DbWeight::get().writes(2))]
         pub fn remove_taboo_foods(origin: OriginFor<T>, chronic: u16) -> DispatchResultWithPostInfo {
             // let sender = ensure_signed(origin)?;
             // 只有root可以保持
