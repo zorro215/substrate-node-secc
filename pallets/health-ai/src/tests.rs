@@ -27,14 +27,3 @@ fn it_works_for_sign_data() {
         assert_noop!(HealthAi::unbind(Origin::signed(102),1),Error::<Test>::NoSuchRelation);
     });
 }
-
-/*#[test]
-fn correct_error_for_none_value() {
-    new_test_ext().execute_with(|| {
-        // Ensure the expected error is thrown when no value is present.
-        assert_noop!(
-			HealthAi::cause_error(Origin::signed(1)),
-			Error::<Test>::NoneValue
-		);
-    });
-}*/
