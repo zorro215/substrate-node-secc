@@ -4,7 +4,7 @@ use frame_support::{assert_ok, assert_noop};
 use sp_runtime::DispatchError;
 
 #[test]
-fn it_works_for_sign_data() {
+fn it_works_for_health_ai() {
     new_test_ext().execute_with(|| {
         // 保存慢性病禁忌菜品
         assert_noop!(HealthAi::save_taboo_foods(Origin::signed(0),1, vec![10, 10]),DispatchError::BadOrigin);

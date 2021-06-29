@@ -170,7 +170,8 @@ pub mod pallet {
     impl<T: Config> Pallet<T> {
         /// 绑定亲属设备
         #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-        pub fn bind(origin: OriginFor<T>, relation_type: T::RelationType, device_type: T::DeviceType, sn: Vec<u8>) -> DispatchResultWithPostInfo {
+        pub fn
+        bind(origin: OriginFor<T>, relation_type: T::RelationType, device_type: T::DeviceType, sn: Vec<u8>) -> DispatchResultWithPostInfo {
             let sender = ensure_signed(origin)?;
             let is_stored = pallet_health_ai::Module::<T>::relation_stored(&sender, &relation_type);
             //  检查是否已经绑定过亲属
