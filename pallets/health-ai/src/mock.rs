@@ -5,6 +5,9 @@ use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup}, testing::Header,
 };
 use frame_system as system;
+use frame_benchmarking::frame_support::Parameter;
+use frame_benchmarking::frame_support::pallet_prelude::Member;
+use pallet_health_ai::Config;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -17,7 +20,7 @@ frame_support::construct_runtime!(
 		UncheckedExtrinsic = UncheckedExtrinsic,
 	{
 		System: frame_system::{Module, Call, Config, Storage, Event<T>},
-		TemplateModule: pallet_template::{Module, Call, Storage, Event<T>},
+		HealthAi: pallet_health_ai::{Module, Call, Storage, Event<T>},
 	}
 );
 
@@ -51,7 +54,8 @@ impl system::Config for Test {
 	type SS58Prefix = SS58Prefix;
 }
 
-impl pallet_template::Config for Test {
+impl Config for Test {
+	type RelationType = u8;
 	type Event = Event;
 }
 
