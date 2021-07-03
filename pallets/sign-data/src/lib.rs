@@ -197,9 +197,9 @@ pub mod pallet {
         /// 保存手环心率数据
         #[pallet::weight(200_000 + T::DbWeight::get().writes(2))]
         pub fn save_wristband_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
-            let _sender = ensure_signed(origin)?;
-            //TODO 判断只能是Bob才能提交数据
-
+            let sender = ensure_signed(origin)?;
+            // 只有root可以保持
+            ensure_root(origin)?;
             // 检查json格式是否合法，不合法抛出异常
             let data: WristbandInfo = serde_json::from_slice(&json).map_err(|_| <Error<T>>::JsonParamError)?;
             // 到到数据主键id
@@ -215,9 +215,9 @@ pub mod pallet {
         /// 保存睡眠报告数据
         #[pallet::weight(20_000 + T::DbWeight::get().writes(2))]
         pub fn save_sleep_report_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
-            let _sender = ensure_signed(origin)?;
-            //TODO 判断只能是Bob才能提交数据
-
+            let sender = ensure_signed(origin)?;
+            // 只有root可以保存
+            ensure_root(origin)?;
             // 检查json格式是否合法，不合法抛出异常
             let data: SleepReportInfo = serde_json::from_slice(&json).map_err(|_| <Error<T>>::JsonParamError)?;
             // 到到数据主键id
@@ -233,9 +233,9 @@ pub mod pallet {
         /// 保存睡眠体征数据
         #[pallet::weight(20_000 + T::DbWeight::get().writes(2))]
         pub fn save_sleep_sign_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
-            let _sender = ensure_signed(origin)?;
-            //TODO 判断只能是Bob才能提交数据
-
+            let sender = ensure_signed(origin)?;
+            // 只有root可以保存
+            ensure_root(origin)?;
             // 检查json格式是否合法，不合法抛出异常
             let data: SleepSignInfo = serde_json::from_slice(&json).map_err(|_| <Error<T>>::JsonParamError)?;
             // 到到数据主键id
@@ -252,9 +252,9 @@ pub mod pallet {
         /// 体检报告文件数据链上存证
         #[pallet::weight(700_000 + T::DbWeight::get().writes(7))]
         pub fn save_medical_info(origin: OriginFor<T>, file_hash: Vec<u8>, id_card: Vec<u8>) -> DispatchResultWithPostInfo {
-            let _sender = ensure_signed(origin)?;
-            //TODO 判断只能是Bob才能提交数据
-
+            let sender = ensure_signed(origin)?;
+            // 只有root可以保存
+            ensure_root(origin)?;
             // Get the block number from the FRAME System module.
             let current_block = <frame_system::Module<T>>::block_number();
             MedicalInfos::<T>::insert(&file_hash, (&id_card, &current_block));
