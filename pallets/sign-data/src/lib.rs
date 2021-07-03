@@ -160,6 +160,8 @@ pub mod pallet {
         RelationDeviceIsNotStored,
         /// json格式数据转换异常
         JsonParamError,
+        /// 文件已存在
+        FileIsStored,
     }
 
     #[pallet::hooks]
@@ -255,6 +257,9 @@ pub mod pallet {
             // let sender = ensure_signed(origin)?;
             // 只有root可以保存
             ensure_root(origin)?;
+            let is_stored = Self::file_stored(&file_hash);
+            //  体检报告是否已经存在
+            ensure!(!is_stored, Error::<T>::FileIsStored);
             // Get the block number from the FRAME System module.
             let current_block = <frame_system::Module<T>>::block_number();
             MedicalInfos::<T>::insert(&file_hash, (&id_card, &current_block));
@@ -265,4 +270,10 @@ pub mod pallet {
     }
 }
 
-impl<T: Config + pallet_health_ai::Config> Pallet<T> {}
+impl<T: Config + pallet_health_ai::Config> Pallet<T> {
+
+    /// 体检报告是否已经存在
+    pub fn file_stored(file_hash: &Vec<u8>) -> bool {
+        return MedicalInfos::<T>::contains_key(file_hash);
+    }
+}
