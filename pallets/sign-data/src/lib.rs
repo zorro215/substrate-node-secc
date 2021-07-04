@@ -214,6 +214,18 @@ pub mod pallet {
             Ok(().into())
         }
 
+        /// 刪除手环心率数据 for test
+        #[pallet::weight(200_000 + T::DbWeight::get().writes(2))]
+        pub fn remove_wristband_info(origin: OriginFor<T>) -> DispatchResultWithPostInfo {
+            // let sender = ensure_signed(origin)?;
+            // 只有root可以保持
+            ensure_root(origin)?;
+
+            WristbandInfos::<T>::remove_all();
+
+            Ok(().into())
+        }
+
         /// 保存睡眠报告数据
         #[pallet::weight(20_000 + T::DbWeight::get().writes(2))]
         pub fn save_sleep_report_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
