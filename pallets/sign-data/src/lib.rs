@@ -200,7 +200,7 @@ pub mod pallet {
         #[pallet::weight(200_000 + T::DbWeight::get().writes(2))]
         pub fn save_wristband_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
             // let sender = ensure_signed(origin)?;
-            // 只有root可以保持
+            // 只有root可以保存
             ensure_root(origin)?;
             // 检查json格式是否合法，不合法抛出异常
             let data: WristbandInfo = serde_json::from_slice(&json).map_err(|_| <Error<T>>::JsonParamError)?;
@@ -218,7 +218,7 @@ pub mod pallet {
         #[pallet::weight(200_000 + T::DbWeight::get().writes(2))]
         pub fn remove_wristband_info(origin: OriginFor<T>) -> DispatchResultWithPostInfo {
             // let sender = ensure_signed(origin)?;
-            // 只有root可以保持
+            // 只有root可以刪除
             ensure_root(origin)?;
 
             WristbandInfos::<T>::remove_all();
