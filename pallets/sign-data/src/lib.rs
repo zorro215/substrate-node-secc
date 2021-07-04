@@ -172,8 +172,7 @@ pub mod pallet {
     impl<T: Config> Pallet<T> {
         /// 绑定亲属设备
         #[pallet::weight(300_000 + T::DbWeight::get().writes(3))]
-        pub fn
-        bind(origin: OriginFor<T>, relation_type: T::RelationType, device_type: T::DeviceType, sn: Vec<u8>) -> DispatchResultWithPostInfo {
+        pub fn bind(origin: OriginFor<T>, relation_type: T::RelationType, device_type: T::DeviceType, sn: Vec<u8>) -> DispatchResultWithPostInfo {
             let sender = ensure_signed(origin)?;
             let is_stored = pallet_health_ai::Module::<T>::relation_stored(&sender, &relation_type);
             //  检查是否已经绑定过亲属
@@ -201,7 +200,7 @@ pub mod pallet {
         pub fn save_wristband_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
             // let sender = ensure_signed(origin)?;
             // 只有root可以保存
-            ensure_root(origin)?;
+            // ensure_root(origin)?;
             // 检查json格式是否合法，不合法抛出异常
             let data: WristbandInfo = serde_json::from_slice(&json).map_err(|_| <Error<T>>::JsonParamError)?;
             // 到到数据主键id
@@ -214,24 +213,24 @@ pub mod pallet {
             Ok(().into())
         }
 
-        /// 刪除手环心率数据 for test
-        #[pallet::weight(200_000 + T::DbWeight::get().writes(2))]
-        pub fn remove_wristband_info(origin: OriginFor<T>) -> DispatchResultWithPostInfo {
-            // let sender = ensure_signed(origin)?;
-            // 只有root可以刪除
-            ensure_root(origin)?;
-
-            WristbandInfos::<T>::remove_all();
-
-            Ok(().into())
-        }
+        // /// 刪除手环心率数据 for test
+        // #[pallet::weight(200_000 + T::DbWeight::get().writes(2))]
+        // pub fn remove_wristband_info(origin: OriginFor<T>) -> DispatchResultWithPostInfo {
+        //     // let sender = ensure_signed(origin)?;
+        //     // 只有root可以刪除
+        //     ensure_root(origin)?;
+        //
+        //     WristbandInfos::<T>::remove_all();
+        //
+        //     Ok(().into())
+        // }
 
         /// 保存睡眠报告数据
         #[pallet::weight(20_000 + T::DbWeight::get().writes(2))]
         pub fn save_sleep_report_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
             // let sender = ensure_signed(origin)?;
             // 只有root可以保存
-            ensure_root(origin)?;
+            // ensure_root(origin)?;
             // 检查json格式是否合法，不合法抛出异常
             let data: SleepReportInfo = serde_json::from_slice(&json).map_err(|_| <Error<T>>::JsonParamError)?;
             // 到到数据主键id
@@ -249,7 +248,7 @@ pub mod pallet {
         pub fn save_sleep_sign_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
             // let sender = ensure_signed(origin)?;
             // 只有root可以保存
-            ensure_root(origin)?;
+            // ensure_root(origin)?;
             // 检查json格式是否合法，不合法抛出异常
             let data: SleepSignInfo = serde_json::from_slice(&json).map_err(|_| <Error<T>>::JsonParamError)?;
             // 到到数据主键id
@@ -268,7 +267,7 @@ pub mod pallet {
         pub fn save_medical_info(origin: OriginFor<T>, file_hash: Vec<u8>, id_card: Vec<u8>) -> DispatchResultWithPostInfo {
             // let sender = ensure_signed(origin)?;
             // 只有root可以保存
-            ensure_root(origin)?;
+            // ensure_root(origin)?;
             let is_stored = Self::file_stored(&file_hash);
             //  体检报告是否已经存在
             ensure!(!is_stored, Error::<T>::FileIsStored);
@@ -283,7 +282,6 @@ pub mod pallet {
 }
 
 impl<T: Config + pallet_health_ai::Config> Pallet<T> {
-
     /// 体检报告是否已经存在
     pub fn file_stored(file_hash: &Vec<u8>) -> bool {
         return MedicalInfos::<T>::contains_key(file_hash);
