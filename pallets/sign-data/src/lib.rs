@@ -198,7 +198,7 @@ pub mod pallet {
         /// 保存手环心率数据
         #[pallet::weight(200_000 + T::DbWeight::get().writes(2))]
         pub fn save_wristband_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
-            let _sender = ensure_signed(origin)?;
+            // let _sender = ensure_signed(origin)?;
             // 只有root可以保存
             ensure_root(origin)?;
             // 检查json格式是否合法，不合法抛出异常
@@ -228,7 +228,7 @@ pub mod pallet {
         /// 保存睡眠报告数据
         #[pallet::weight(20_000 + T::DbWeight::get().writes(2))]
         pub fn save_sleep_report_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
-            let _sender = ensure_signed(origin)?;
+            // let _sender = ensure_signed(origin)?;
             // 只有root可以保存
             ensure_root(origin)?;
             // 检查json格式是否合法，不合法抛出异常
@@ -246,7 +246,7 @@ pub mod pallet {
         /// 保存睡眠体征数据
         #[pallet::weight(20_000 + T::DbWeight::get().writes(2))]
         pub fn save_sleep_sign_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
-            let _sender = ensure_signed(origin)?;
+            // let _sender = ensure_signed(origin)?;
             // 只有root可以保存
             ensure_root(origin)?;
             // 检查json格式是否合法，不合法抛出异常
@@ -264,7 +264,7 @@ pub mod pallet {
         /// 体检报告文件数据链上存证
         #[pallet::weight(700_000 + T::DbWeight::get().writes(7))]
         pub fn save_medical_info(origin: OriginFor<T>, file_hash: Vec<u8>, id_card: Vec<u8>) -> DispatchResultWithPostInfo {
-            let _sender = ensure_signed(origin)?;
+            // let _sender = ensure_signed(origin)?;
             // 只有root可以保存
             ensure_root(origin)?;
             let is_stored = Self::file_stored(&file_hash);
