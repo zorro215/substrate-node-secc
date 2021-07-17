@@ -200,7 +200,7 @@ pub mod pallet {
         pub fn save_wristband_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
             let _sender = ensure_signed(origin)?;
             // 只有root可以保存
-            // ensure_root(origin)?;
+            ensure_root(origin)?;
             // 检查json格式是否合法，不合法抛出异常
             let data: WristbandInfo = serde_json::from_slice(&json).map_err(|_| <Error<T>>::JsonParamError)?;
             // 到到数据主键id
@@ -230,7 +230,7 @@ pub mod pallet {
         pub fn save_sleep_report_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
             let _sender = ensure_signed(origin)?;
             // 只有root可以保存
-            // ensure_root(origin)?;
+            ensure_root(origin)?;
             // 检查json格式是否合法，不合法抛出异常
             let data: SleepReportInfo = serde_json::from_slice(&json).map_err(|_| <Error<T>>::JsonParamError)?;
             // 到到数据主键id
@@ -248,7 +248,7 @@ pub mod pallet {
         pub fn save_sleep_sign_info(origin: OriginFor<T>, json: Vec<u8>) -> DispatchResultWithPostInfo {
             let _sender = ensure_signed(origin)?;
             // 只有root可以保存
-            // ensure_root(origin)?;
+            ensure_root(origin)?;
             // 检查json格式是否合法，不合法抛出异常
             let data: SleepSignInfo = serde_json::from_slice(&json).map_err(|_| <Error<T>>::JsonParamError)?;
             // 到到数据主键id
@@ -266,7 +266,7 @@ pub mod pallet {
         pub fn save_medical_info(origin: OriginFor<T>, file_hash: Vec<u8>, id_card: Vec<u8>) -> DispatchResultWithPostInfo {
             let _sender = ensure_signed(origin)?;
             // 只有root可以保存
-            // ensure_root(origin)?;
+            ensure_root(origin)?;
             let is_stored = Self::file_stored(&file_hash);
             //  体检报告是否已经存在
             ensure!(!is_stored, Error::<T>::FileIsStored);
